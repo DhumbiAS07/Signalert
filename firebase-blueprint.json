@@ -1,0 +1,73 @@
+{
+  "entities": {
+    "Report": {
+      "title": "Report",
+      "description": "A road sign damage report submitted by a community member.",
+      "type": "object",
+      "properties": {
+        "imageUrl": {
+          "type": "string",
+          "description": "Base64 encoded image data URL of the sign"
+        },
+        "signType": {
+          "type": "string",
+          "description": "Identified road sign type"
+        },
+        "damageDescription": {
+          "type": "string",
+          "description": "Description of the visible damage"
+        },
+        "severityScore": {
+          "type": "integer",
+          "description": "Severity of damage, on a scale of 1 to 5"
+        },
+        "latitude": {
+          "type": "number",
+          "description": "Latitude coordinate"
+        },
+        "longitude": {
+          "type": "number",
+          "description": "Longitude coordinate"
+        },
+        "userId": {
+          "type": "string",
+          "description": "UID of the user who submitted the report"
+        },
+        "userName": {
+          "type": "string",
+          "description": "Display name of the user who submitted the report"
+        },
+        "userEmail": {
+          "type": "string",
+          "description": "Email address of the user who submitted the report"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["Pending / Not Done", "Work Done"],
+          "description": "Resolution status set by municipal officials"
+        },
+        "resolvedBy": {
+          "type": "string",
+          "description": "Name or email of the official who updated the status"
+        },
+        "resolvedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the complaint was marked as Work Done"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the report was submitted"
+        }
+      },
+      "required": ["imageUrl", "signType", "damageDescription", "severityScore", "latitude", "longitude", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/reports/{reportId}": {
+      "schema": "Report",
+      "description": "Collection of all submitted damage reports"
+    }
+  }
+}

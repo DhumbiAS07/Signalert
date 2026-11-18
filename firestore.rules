@@ -1,0 +1,66 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 1. Master Gate / Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 2. Reports Collection Rules
+    match /reports/{reportId} {
+      // Anyone in the community or official portal can read and list reports
+      allow read, list: if true;
+
+      // Creating a report is allowed if it satisfies strict schema validation
+      // (Server backend writes new AI-analyzed reports without client auth token)
+      allow create: if isValidId(reportId) && isValidReport(request.resource.data);
+
+      // Authenticated users can delete logs from the registry
+      allow delete: if request.auth != null && isValidId(reportId);
+
+      // Any signed-in user can update resolution status fields
+      allow update: if request.auth != null
+        && isValidId(reportId)
+        && isValidReport(request.resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'resolvedBy', 'resolvedAt']);
+    }
+  }
+}
+
+// Global Validation Primitives
+function isValidId(id) {
+  return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+}
+
+function isValidReport(data) {
+  return data.keys().hasAll(['imageUrl', 'signType', 'damageDescription', 'severityScore', 'latitude', 'longitude', 'timestamp'])
+    && data.keys().hasOnly([
+      'imageUrl',
+      'signType',
+      'damageDescription',
+      'severityScore',
+      'latitude',
+      'longitude',
+      'timestamp',
+      'userId',
+      'userName',
+      'userEmail',
+      'status',
+      'resolvedBy',
+      'resolvedAt'
+    ])
+    && data.imageUrl is string && data.imageUrl.size() <= 3000000
+    && data.signType is string && data.signType.size() <= 200
+    && data.damageDescription is string && data.damageDescription.size() <= 2000
+    && (data.severityScore is int || data.severityScore is float) && data.severityScore >= 1 && data.severityScore <= 5
+    && (data.latitude is float || data.latitude is int)
+    && (data.longitude is float || data.longitude is int)
+    && data.timestamp != null
+    && (!('userId' in data) || data.userId == null || (data.userId is string && data.userId.size() <= 200))
+    && (!('userName' in data) || data.userName == null || (data.userName is string && data.userName.size() <= 200))
+    && (!('userEmail' in data) || data.userEmail == null || (data.userEmail is string && data.userEmail.size() <= 200))
+    && (!('status' in data) || (data.status is string && data.status in ['Pending / Not Done', 'Work Done']))
+    && (!('resolvedBy' in data) || data.resolvedBy == null || (data.resolvedBy is string && data.resolvedBy.size() <= 200))
+    && (!('resolvedAt' in data) || data.resolvedAt == null || (data.resolvedAt is string && data.resolvedAt.size() <= 100));
+}

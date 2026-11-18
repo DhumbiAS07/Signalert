@@ -1,0 +1,6 @@
+{
+  "name": "SignAlert",
+  "description": "A community road sign damage reporting system that captures location, snap images, and utilizes server-side Gemini AI to analyze damages and severity on a Leaflet map dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SignAlert - Community Road Sign Damage Reporting</title>
+    <meta name="description" content="A community road sign damage reporting system that captures location, snap images, and utilizes server-side Gemini AI to analyze damages and severity on a Leaflet map dashboard." />
+    <meta property="og:title" content="SignAlert - Community Road Sign Damage Reporting" />
+    <meta property="og:description" content="A community road sign damage reporting system that captures location, snap images, and utilizes server-side Gemini AI to analyze damages and severity on a Leaflet map dashboard." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <!-- Google Maps Platform Quota Defense Listener -->
+    <script>
+      window.gm_authFailure = function() {
+        window.dispatchEvent(new CustomEvent('gmp-quota-exceeded'));
+      };
+      var origError = console.error;
+      console.error = function() {
+        origError.apply(console, arguments);
+        var args = Array.prototype.slice.call(arguments);
+        var msg = args.map(function(a) { return String(a); }).join(' ');
+        if (msg.indexOf('OverQuotaMapError') !== -1 || msg.indexOf('QuotaExceededError') !== -1) {
+          window.dispatchEvent(new CustomEvent('gmp-quota-exceeded'));
+        }
+      };
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
